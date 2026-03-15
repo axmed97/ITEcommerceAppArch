@@ -8,4 +8,5 @@ namespace DataAccess.Abstract;
 
 public interface ICategoryDAL : IRepositoryBase<Category>
 {
+    Category GetFromRecycleBin(Guid id);
 }

@@ -14,4 +14,15 @@ public sealed class AppDbContext :  DbContext
     }
 
     public DbSet<Product> Products { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Color> Colors { get; set; }
+    public DbSet<ProductColor> ProductColors { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Category>().HasQueryFilter(x => x.IsDeleted == false);
+        modelBuilder.Entity<Product>().HasQueryFilter(x => x.IsDeleted == false);
+    }
 }

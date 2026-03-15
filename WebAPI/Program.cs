@@ -12,9 +12,8 @@ builder.Services.AddBusinessService();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
-
-builder.Services.AddScoped<IProductService, ProductManagerV2>();
 
 
 var app = builder.Build();
@@ -23,7 +22,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+// Development
+// Preproduction ?
+// Production
 
 app.UseHttpsRedirection();
 

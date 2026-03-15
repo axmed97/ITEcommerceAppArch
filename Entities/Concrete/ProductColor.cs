@@ -1,6 +1,8 @@
-﻿namespace Entities.Concrete;
+﻿using Entities.Concrete.Common;
 
-public class ProductColor
+namespace Entities.Concrete;
+
+public class ProductColor : BaseEntity
 {
     public int ProductId { get; set; }
     public Product Product { get; set; }
