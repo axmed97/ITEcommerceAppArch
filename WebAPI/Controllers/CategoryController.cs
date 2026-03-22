@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
+using Core.Utilities.Results.Concret;
 using Entities.DTOs.CategoryDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,15 +21,15 @@ public class CategoryController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateCategoryDTO entity)
     {
-        await _categoryService.CreateAsync(entity);
-        return Ok();
+        var result = await _categoryService.CreateAsync(entity);
+        return StatusCode((int)result.StatusCode, result);
     }
 
     [HttpGet("{id}")]
     public IActionResult Get(string id)
     {
-        var model = _categoryService.Get(Guid.Parse(id));
-        return Ok(model);
+        var result = _categoryService.Get(Guid.Parse(id));
+        return StatusCode((int)result.StatusCode, result);
     }
 
     [HttpGet("recycleBin/{id}")]
@@ -40,8 +42,8 @@ public class CategoryController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Update(UpdateCategoryDTO entity)
     {
-        await _categoryService.UpdateAsync(entity);
-        return Ok();
+        var result = await _categoryService.UpdateAsync(entity);
+        return StatusCode((int)result.StatusCode, result);
     }
 
     [HttpPatch("{id}")]
@@ -58,9 +60,10 @@ public class CategoryController : ControllerBase
         return Ok();
     }
     [HttpGet]
+    [Authorize]
     public IActionResult GetAll()
     {
-        var models = _categoryService.GetAll();
-        return Ok(models);
+        var result = _categoryService.GetAll();
+        return StatusCode((int)result.StatusCode, result);
     }
 }
