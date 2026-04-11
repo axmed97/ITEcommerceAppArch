@@ -1,12 +1,12 @@
 ﻿using Core.Utilities.Results.Abstract;
-using Entities.DTOs.ProductsDTOs;
+using Entities.DTOs.RoleDTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Business.Abstract;
 
-public interface IProductService
+public interface IRoleService
 {
-    Task<IResult> CreateAsync(AddProductDTO entity);
+    Task<IResult> CreateAsync(AddRoleDTO entity);
 }

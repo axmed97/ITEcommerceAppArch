@@ -10,4 +10,6 @@ public interface IAuthService
     Task<IDataResult<Token>> LoginAsync(LoginDTO entity);
     Task<IDataResult<Token>> RefreshLoginAsync(string refreshToken);
     Task<IResult> LogoutAsync(string userId);
+    Task<IResult> AssignRoleAsync(AssignRoleDTO entity);
+    Task<IResult> RemoveRoleAsync(RemoveRoleDTO entity);
 }

@@ -1,8 +1,11 @@
 ﻿using Business.Abstract;
 using Business.Concrete;
+using Business.Validators.AuthValidators;
 using DataAccess.Abstract;
 using DataAccess.Concrete.EntityFramework;
 using Entities.Concrete;
+using Entities.DTOs.AuthDTOs;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,13 +22,25 @@ public static class ServiceRegistration
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
+        services.AddMemoryCache();
+
         services.AddScoped<IProductService, ProductManager>();
         services.AddScoped<IProductDAL, EfProductDAL>();
 
         services.AddScoped<ICategoryDAL, EfCategoryDAL>();
         services.AddScoped<ICategoryService, CategoryManager>();
 
+        services.AddScoped<IColorDAL, EfColorDAL>();
+        services.AddScoped<IColorService, ColorManager>();
+
         services.AddScoped<IAuthService, AuthManager>();
         services.AddScoped<ITokenService, TokenManager>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IUploadService, UploadManager>();
+
+
+
+        services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+        ValidatorOptions.Global.LanguageManager.Culture = new System.Globalization.CultureInfo("az");
     }
 }

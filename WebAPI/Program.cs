@@ -4,12 +4,24 @@ using Business.Concrete;
 using Business.DependencyResolver;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
+using WebAPI.Middewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Services.AddProblemDetails();
 // Service Registrations
 builder.Services.AddBusinessService();
+
+builder.Services.AddCors(option => option.AddPolicy("Policy", policy =>
+{
+    policy
+    .AllowAnyHeader()
+    .WithOrigins("http://localhost:4200", "https://decorilla.az")
+    .AllowCredentials()
+    .AllowAnyMethod();
+}));
 
 // Add services to the container.
 
@@ -40,6 +52,13 @@ builder.Services.AddAuthentication(auth =>
     };
 });
 
+builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
+
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,10 +73,14 @@ if (app.Environment.IsDevelopment())
 // Preproduction ?
 // Production
 
+app.UseCors("Policy");
 app.UseHttpsRedirection();
+//app.UseExceptionHandler();
+
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.MapControllers();
 

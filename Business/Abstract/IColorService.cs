@@ -1,12 +1,12 @@
 ﻿using Core.Utilities.Results.Abstract;
-using Entities.DTOs.ProductsDTOs;
+using Entities.DTOs.ColorDTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Business.Abstract;
 
-public interface IProductService
+public interface IColorService
 {
-    Task<IResult> CreateAsync(AddProductDTO entity);
+    Task<IResult> CreateAsync(AddColorDTO entity);
 }

@@ -48,4 +48,18 @@ public class AuthController : ControllerBase
         var result = await _authService.LogoutAsync(userId);
         return StatusCode((int)result.StatusCode, result);
     }
+
+    [HttpPut("[action]")]
+    public async Task<IActionResult> AssignRole(AssignRoleDTO entity)
+    {
+        var result = await _authService.AssignRoleAsync(entity);
+        return StatusCode((int)result.StatusCode, result);
+    }
+
+    [HttpPut("[action]")]
+    public async Task<IActionResult> RemoveRole(RemoveRoleDTO entity)
+    {
+        var result = await _authService.RemoveRoleAsync(entity);
+        return StatusCode((int)result.StatusCode, result);
+    }
 }

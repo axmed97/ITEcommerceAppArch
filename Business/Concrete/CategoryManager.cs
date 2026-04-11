@@ -4,8 +4,11 @@ using Core.Utilities.Results.Concret;
 using Core.Utilities.Results.Concret.ErrorResults;
 using Core.Utilities.Results.Concret.SuccessResults;
 using DataAccess.Abstract;
+using DataAccess.Concrete.EntityFramework;
 using Entities.Concrete;
 using Entities.DTOs.CategoryDTOs;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
 namespace Business.Concrete;
@@ -13,10 +16,11 @@ namespace Business.Concrete;
 public class CategoryManager : ICategoryService
 {
     private readonly ICategoryDAL _categoryDAL;
-
-    public CategoryManager(ICategoryDAL categoryDAL)
+    private readonly IMemoryCache _memoryCache;
+    public CategoryManager(ICategoryDAL categoryDAL, IMemoryCache memoryCache)
     {
         _categoryDAL = categoryDAL;
+        _memoryCache = memoryCache;
     }
 
     public async Task<IResult> CreateAsync(CreateCategoryDTO entity)
@@ -24,11 +28,13 @@ public class CategoryManager : ICategoryService
         Category model = new()
         {
             Name = entity.Name,
-            CreatedDate = DateTime.Now,
+            //CreatedDate = DateTime.Now,
             IsDeleted = false
         };
 
         await _categoryDAL.AddAsync(model);
+
+        _memoryCache.Remove("category");
 
 
         return new SuccessResult(HttpStatusCode.Created, "Created");
@@ -53,15 +59,37 @@ public class CategoryManager : ICategoryService
 
     public IDataResult<List<GetCategoryDTO>> GetAll()
     {
-        var categories = _categoryDAL.GetAll(tracking: false);
-
-        List<GetCategoryDTO> models = categories.Select(x => new GetCategoryDTO()
+        List<Category> x = _memoryCache.Get<List<Category>>("category");
+        if (x != null)
         {
-            Id = x.Id,
-            Name = x.Name
-        }).ToList();
+            List<GetCategoryDTO> models = x.Select(x => new GetCategoryDTO()
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
 
-        return new DataResult<List<GetCategoryDTO>>(models, HttpStatusCode.OK, true);
+            return new DataResult<List<GetCategoryDTO>>(models, HttpStatusCode.OK, true);
+        }
+        else
+        {
+            List<Category> categories = _categoryDAL.GetAll(tracking: false);
+
+            _memoryCache.Set("category", categories, options: new()
+            {
+                AbsoluteExpiration =  DateTime.Now.AddSeconds(30),
+                SlidingExpiration = TimeSpan.FromSeconds(5)
+            });
+
+            List<GetCategoryDTO> models = categories.Select(x => new GetCategoryDTO()
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+
+            return new DataResult<List<GetCategoryDTO>>(models, HttpStatusCode.OK, true);
+        }
+
+        
     }
 
     public GetCategoryDTO GetFromRecycleBin(Guid id)
@@ -87,7 +115,7 @@ public class CategoryManager : ICategoryService
     {
         var model = _categoryDAL.GetById(id);
 
-        model.DeletedDate = DateTime.Now;
+        //model.DeletedDate = DateTime.Now;
         model.IsDeleted = true;
         await _categoryDAL.UpdateAsync(model);
     }
@@ -99,7 +127,7 @@ public class CategoryManager : ICategoryService
             return new ErrorResult(HttpStatusCode.NotFound, "Category not found!");
 
         category.Name = entity.Name;
-        category.UpdatedDate = DateTime.Now;
+        //category.UpdatedDate = DateTime.Now;
 
         await _categoryDAL.UpdateAsync(category);
 

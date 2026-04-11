@@ -9,6 +9,7 @@ namespace WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+//[Authorize(Roles = "Admin")]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
@@ -60,7 +61,6 @@ public class CategoryController : ControllerBase
         return Ok();
     }
     [HttpGet]
-    [Authorize]
     public IActionResult GetAll()
     {
         var result = _categoryService.GetAll();
