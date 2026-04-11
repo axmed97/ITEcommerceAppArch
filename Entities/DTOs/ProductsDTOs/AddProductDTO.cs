@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Entities.DTOs.ProductsDTOs;
+﻿namespace Entities.DTOs.ProductsDTOs;
 
 public class AddProductDTO
 {
